@@ -43,6 +43,9 @@ cEvents::cEvents(void)
     zStart=EVENTGEN_Z_MIN;
     zEnd=EVENTGEN_Z_MAX;
     littleb=0;
+    eE=ePhi=eCTheta=nPhi=nCTheta=gCTheta=gSTheta=eSTheta=nSTheta=cos_en=cos_eg=cos_ng=pP=pCTheta=pSTheta=eP=nE=pCPhi=pSPhi=Prob=pdn=pde=pdg=edg=edn=ndg=gE=gPhi=0.;
+    pKE=mxp0=eg0=mzp0=z0=ee0=mxg0=mze0=mxe0=myg0=ep0=fraction=x0=y0=ranProb=mye0=pPhi=mzg0=avg_integrand=myp0=0.;
+    eventStart=eventEnd=0;
 }
 
 

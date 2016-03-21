@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 cField3D::cField3D()
 {
+	zFinal=xFinal=yFinal=0;
 	rows=columns=layers=arraySize=0;
 	xStart=yStart=zStart=xSpacing=ySpacing=zSpacing=0.0;
 	fileLoaded = false;
@@ -38,6 +39,11 @@ bool cField3D::isPositionOutsideField(cVector3D pos) // Assumes Y field is mirro
 //cSField3D
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 cSField3D::cSField3D(){
+	cField3D();
+	xFloor=yFloor=zFloor=0;
+	xMod=yMod=zMod=0;
+	result =0;
+    xF=yF=zF=99999999;
 }
 
 cSField3D::~cSField3D()
@@ -204,8 +210,15 @@ void cSField3D::linearInterp(const cVector3D& pos,double& valOut){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 cVField3D::cVField3D()
 {
-    xF=yF=zF=-999999;
+	cField3D();
+    xFloor=yFloor=zFloor=0;
+	xMod=yMod=zMod=0;
+    xF=yF=zF=99999999;
     symmetryInY=false;
+    mu2=mu3=0;
+    xModInv=yModInv=zModInv=0;
+    xResult=yResult=zResult=0;
+    xF2=yF2=zF2=0;
 }
 
 cVField3D::~cVField3D()
@@ -528,6 +541,8 @@ cField2D::cField2D()
 	rows=columns=arraySize=0;
 	rStart=zStart=rSpacing=zSpacing=0.0;
 	fileLoaded=false;
+	transposedField=false;
+	rFinal=zFinal=0;
 }
 
 void cField2D::calcPositionLimits()
@@ -556,6 +571,11 @@ bool cField2D::isPositionOutsideField(double zPosition, double radius)
 
 
 cSField2D::cSField2D(){
+	cField2D();
+	rMod=rResult=rF=zF=zResult=0;
+	radius=result=0;
+	zMod=rMod=0;
+	rFloor=zFloor=0;
 }
 
 cSField2D::~cSField2D()
@@ -739,6 +759,12 @@ void cSField2D::linearInterp(const cVector2D& pos,double& valOut){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 cVField2D::cVField2D()
 {
+	cField3D();
+	rMod=rResult=rF=zF=zResult=0;
+	radius=0;
+	zMod=rMod=0;
+	rFloor=zFloor=0;
+
 }
 
 cVField2D::~cVField2D()
