@@ -7,13 +7,13 @@
 #include <cmath>
 #include <time.h>
 
-#include "RDK2Analysis.h"
+#include "RDK2IO.h"
 
 using namespace std;
 
-ClassImp(RDK2ExpAnalysis);
+ClassImp(RDK2ExpAnalyzer);
 
-RDK2ExpAnalysis::RDK2ExpAnalysis()
+RDK2ExpAnalyzer::RDK2ExpAnalyzer()
 {
     SetName("RDK2ExpAnalysis");
     epCounts=0;
@@ -26,7 +26,7 @@ RDK2ExpAnalysis::RDK2ExpAnalysis()
     numLiveBGO=0;
     numLiveBAPD=0;
     NULLHists();
-    expChain=NULL;
+    expChain=nullptr;
     chainLoaded=false;
     for (int i = 0;i< Exp_NUMBGO;i++)
     {
@@ -40,40 +40,40 @@ RDK2ExpAnalysis::RDK2ExpAnalysis()
     averageEPCountsForLiveBAPD=0;
 }
 
-RDK2ExpAnalysis::~RDK2ExpAnalysis()
+RDK2ExpAnalyzer::~RDK2ExpAnalyzer()
 {
     ResetHists();
 }
 
-void RDK2ExpAnalysis::NULLHists()
+void RDK2ExpAnalyzer::NULLHists()
 {
-    ep_eEHist=NULL;
-    ep_pEHist=NULL;
-    ep_pTHist=NULL;
-    epg_eEHist=NULL;
-    epg_pEHist=NULL;
-    epg_pTHist=NULL;
-    epbg_eEHist=NULL;
-    epbg_pEHist=NULL;
-    epbg_pTHist=NULL;
-    epg_gEAvgHist=NULL;
-    epg_gEAvgVarHist=NULL;
+    ep_eEHist=nullptr;
+    ep_pEHist=nullptr;
+    ep_pTHist=nullptr;
+    epg_eEHist=nullptr;
+    epg_pEHist=nullptr;
+    epg_pTHist=nullptr;
+    epbg_eEHist=nullptr;
+    epbg_pEHist=nullptr;
+    epbg_pTHist=nullptr;
+    epg_gEAvgHist=nullptr;
+    epg_gEAvgVarHist=nullptr;
     for (int i = 0;i< Exp_NUMBGO;i++)
     {
-    	epg_gEDetHists[i]=NULL;
-    	epg_gEDetVarHists[i]=NULL;
+    	epg_gEDetHists[i]=nullptr;
+    	epg_gEDetVarHists[i]=nullptr;
     }
 
     for (int i = 0;i< Exp_NUMBAPD;i++)
     {
-    	epbg_bGEDetHists[i]=NULL;
-    	epbg_bGEDetVarHists[i]=NULL;
+    	epbg_bGEDetHists[i]=nullptr;
+    	epbg_bGEDetVarHists[i]=nullptr;
     }
-    epbg_bGEAvgHist=NULL;
-    epbg_bGEAvgVarHist=NULL;
+    epbg_bGEAvgHist=nullptr;
+    epbg_bGEAvgVarHist=nullptr;
 }
 
-void RDK2ExpAnalysis::ResetHists()
+void RDK2ExpAnalyzer::ResetHists()
 {
     delete ep_eEHist;
     delete ep_pEHist;
@@ -103,7 +103,7 @@ void RDK2ExpAnalysis::ResetHists()
     NULLHists();
 }
 
-RDK2ExpAnalysis::RDK2ExpAnalysis(TString inpName, TString inpTitle, TString inpPIDString,TString inpGroupString, RDK2CutSet inpCutSet,const double inpBGOWindows[6],const double inpBAPDWindows[6])
+RDK2ExpAnalyzer::RDK2ExpAnalyzer(TString inpName, TString inpTitle, TString inpPIDString,TString inpGroupString, RDK2CutSet inpCutSet,const double inpBGOWindows[6],const double inpBAPDWindows[6])
 {
     NULLHists();
     numLiveBGO=0;
@@ -126,7 +126,7 @@ RDK2ExpAnalysis::RDK2ExpAnalysis(TString inpName, TString inpTitle, TString inpP
     	epCountsForLiveBAPD[i]=0;
     }
     chainLoaded=false;
-    expChain=NULL;
+    expChain=nullptr;
     SetName(inpName);
     SetTitle(inpTitle);
 
@@ -142,16 +142,16 @@ RDK2ExpAnalysis::RDK2ExpAnalysis(TString inpName, TString inpTitle, TString inpP
     theCutSet=inpCutSet;
 }
 
-void RDK2ExpAnalysis::loadEventChain()
+void RDK2ExpAnalyzer::loadEventChain()
 {
-    int* seriesArray=NULL;
+    int* seriesArray=nullptr;
     int numSeries=getSeriesArray(groupString, &seriesArray);
     expChain=makeExpChain(PIDString,numSeries,seriesArray);
     chainLoaded=true;
     delete[] seriesArray;
 }
 
-TH1* RDK2ExpAnalysis::MakeHist(TString histName,TString drawString,TCut inpCut,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ)
+TH1* RDK2ExpAnalyzer::MakeHist(TString histName,TString drawString,TCut inpCut,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ)
 {
     gROOT->cd();
     TH1* histPrototype;
@@ -172,7 +172,7 @@ TH1* RDK2ExpAnalysis::MakeHist(TString histName,TString drawString,TCut inpCut,H
 
 }
 
-TH1* RDK2ExpAnalysis::MakeHist(TString histName,TString drawString,TCut inpCut,TH1* histPrototype)
+TH1* RDK2ExpAnalyzer::MakeHist(TString histName,TString drawString,TCut inpCut,TH1* histPrototype)
 {
     if(!chainLoaded)
     {
@@ -190,10 +190,10 @@ TH1* RDK2ExpAnalysis::MakeHist(TString histName,TString drawString,TCut inpCut,T
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeRadHist(TString histName,CoDet detType,TString drawString,int peakOption,int det,TH1* histPrototype,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeRadHist(TString histName,CoDet detType,TString drawString,int peakOption,int det,TH1* histPrototype,bool scaleByEPCounts)
 {
-    TH1* outHist=NULL;
-    int* countsToUseArray=NULL;
+    TH1* outHist=nullptr;
+    int* countsToUseArray=nullptr;
     TString detString;
     if(detType==DET_EPG)
     {
@@ -247,7 +247,7 @@ TH1* RDK2ExpAnalysis::MakeRadHist(TString histName,CoDet detType,TString drawStr
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeRadHist(TString histName,CoDet detType,TString drawString,int peakOption,int det,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeRadHist(TString histName,CoDet detType,TString drawString,int peakOption,int det,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
 {
     gROOT->cd();
     TH1* histPrototype;
@@ -265,7 +265,7 @@ TH1* RDK2ExpAnalysis::MakeRadHist(TString histName,CoDet detType,TString drawStr
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeRadAvgHist(TString histName,CoDet detType,TString drawString,int peakOption,TH1* histPrototype,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeRadAvgHist(TString histName,CoDet detType,TString drawString,int peakOption,TH1* histPrototype,bool scaleByEPCounts)
 {
     int numDets=0;
     int numLiveDets=0;
@@ -299,7 +299,7 @@ TH1* RDK2ExpAnalysis::MakeRadAvgHist(TString histName,CoDet detType,TString draw
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeRadAvgHist(TString histName,CoDet detType,TString drawString,int peakOption,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeRadAvgHist(TString histName,CoDet detType,TString drawString,int peakOption,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
 {
     gROOT->cd();
     TH1* histPrototype;
@@ -318,7 +318,7 @@ TH1* RDK2ExpAnalysis::MakeRadAvgHist(TString histName,CoDet detType,TString draw
 }
 
 
-TH1* RDK2ExpAnalysis::MakeBGSubHist(TString histName,CoDet detType,TString drawString,int det,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeBGSubHist(TString histName,CoDet detType,TString drawString,int det,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
 {
     gROOT->cd();
     TH1* histPrototype;
@@ -336,7 +336,7 @@ TH1* RDK2ExpAnalysis::MakeBGSubHist(TString histName,CoDet detType,TString drawS
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeBGSubHist(TString histName,CoDet detType,TString drawString, int det,TH1* histPrototype,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeBGSubHist(TString histName,CoDet detType,TString drawString, int det,TH1* histPrototype,bool scaleByEPCounts)
 {
 
     TH1* prePeakHist=MakeRadHist("prePeakHist",detType,drawString,0,det,histPrototype, scaleByEPCounts);
@@ -353,7 +353,7 @@ TH1* RDK2ExpAnalysis::MakeBGSubHist(TString histName,CoDet detType,TString drawS
 
 }
 
-TH1* RDK2ExpAnalysis::MakeBGSubAvgHist(TString histName,CoDet detType,TString drawString,TH1* histPrototype,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeBGSubAvgHist(TString histName,CoDet detType,TString drawString,TH1* histPrototype,bool scaleByEPCounts)
 {
     int numDets=0;
     int numLiveDets=0;
@@ -389,7 +389,7 @@ TH1* RDK2ExpAnalysis::MakeBGSubAvgHist(TString histName,CoDet detType,TString dr
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeBGSubAvgHist(TString histName,CoDet detType,TString drawString,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
+TH1* RDK2ExpAnalyzer::MakeBGSubAvgHist(TString histName,CoDet detType,TString drawString,HistDim inpHistDimX, HistDim inpHistDimY,HistDim inpHistDimZ,bool scaleByEPCounts)
 {
     gROOT->cd();
     TH1* histPrototype;
@@ -407,7 +407,7 @@ TH1* RDK2ExpAnalysis::MakeBGSubAvgHist(TString histName,CoDet detType,TString dr
     return outHist;
 }
 
-TH1* RDK2ExpAnalysis::MakeStandardHist(TString histName,CoDet detType,TString drawString,HistDim inpHistDimX)
+TH1* RDK2ExpAnalyzer::MakeStandardHist(TString histName,CoDet detType,TString drawString,HistDim inpHistDimX)
 {
     TH1* outHist;
     if(detType==DET_EPBG || detType==DET_EPG)
@@ -422,7 +422,7 @@ TH1* RDK2ExpAnalysis::MakeStandardHist(TString histName,CoDet detType,TString dr
     return outHist;
 }
 
-void RDK2ExpAnalysis::MakeAllStandardHists()
+void RDK2ExpAnalyzer::MakeAllStandardHists()
 {
     cout << "Making all standard histograms for: " << GetName() << endl;
     time_t startTime,endTime;
@@ -554,7 +554,7 @@ void RDK2ExpAnalysis::MakeAllStandardHists()
 }
 
 
-int RDK2ExpAnalysis::CalcEPCounts()
+int RDK2ExpAnalyzer::CalcEPCounts()
 {
     HistDim simpleDim={3,-10,800};
     TH1* epRateHist=MakeHist("epRateHist","SBDEDepP",theCutSet.CreateExpEPCut(),simpleDim);
@@ -563,7 +563,7 @@ int RDK2ExpAnalysis::CalcEPCounts()
     return epCounts;
 }
 
-double RDK2ExpAnalysis::CalcEPGCounts(CoDet detType,double& error)
+double RDK2ExpAnalyzer::CalcEPGCounts(CoDet detType,double& error)
 {
     double answer;
     HistDim simpleDim={3,-10,800};
@@ -575,7 +575,7 @@ double RDK2ExpAnalysis::CalcEPGCounts(CoDet detType,double& error)
 }
 
 
-double RDK2ExpAnalysis::CalcEPGPerEP(CoDet detType,double& error) //Presuming error on EP is small
+double RDK2ExpAnalyzer::CalcEPGPerEP(CoDet detType,double& error) //Presuming error on EP is small
 {
     double answer;
     HistDim simpleDim={3,-10,800};
@@ -586,7 +586,7 @@ double RDK2ExpAnalysis::CalcEPGPerEP(CoDet detType,double& error) //Presuming er
     return answer;
 }
 
-void RDK2ExpAnalysis::CalcRates()
+void RDK2ExpAnalyzer::CalcRates()
 {
     double tempError;
     CalcEPCounts();
@@ -598,7 +598,7 @@ void RDK2ExpAnalysis::CalcRates()
 //    CalcEPGPerEP(DET_EPBG,tempError);
 }
 
-void RDK2ExpAnalysis::PrintRates()
+void RDK2ExpAnalyzer::PrintRates()
 {
     cout << GetName() << " Rates:" << endl;
     cout << "EP counts: " << epCounts << endl;
@@ -608,7 +608,7 @@ void RDK2ExpAnalysis::PrintRates()
     cout << "EPBG Per EP: " << epbgPerEP << " +/- " << epbgPerEPError << endl;
 }
 
-TCut RDK2ExpAnalysis::CreateWindowCut(CoDet detType, int peakOption,int det)
+TCut RDK2ExpAnalyzer::CreateWindowCut(CoDet detType, int peakOption,int det)
 {
     double* windows;
     TString detString;
@@ -631,7 +631,7 @@ TCut RDK2ExpAnalysis::CreateWindowCut(CoDet detType, int peakOption,int det)
     return TCut(cutString.Data());
 }
 
-double RDK2ExpAnalysis::GetPrePeakScaleFactor(CoDet detType)
+double RDK2ExpAnalyzer::GetPrePeakScaleFactor(CoDet detType)
 {
     double* windows;
     if(detType==DET_EPG)
@@ -651,7 +651,7 @@ double RDK2ExpAnalysis::GetPrePeakScaleFactor(CoDet detType)
     return scaleFactor;
 }
 
-void RDK2ExpAnalysis::CalcEPCountsForLiveDets(CoDet detType)
+void RDK2ExpAnalyzer::CalcEPCountsForLiveDets(CoDet detType)
 {
     int* theDetCounts;
     int numDets;
@@ -711,7 +711,7 @@ void RDK2ExpAnalysis::CalcEPCountsForLiveDets(CoDet detType)
     return;
 }
 
-double RDK2ExpAnalysis::GetWindowVal(CoDet detType, int i)
+double RDK2ExpAnalyzer::GetWindowVal(CoDet detType, int i)
 {
     if(detType==DET_EPBG)
     {
@@ -764,7 +764,7 @@ const int EXP_SERIES_ID_LIST_G8[NUM_EXP_SERIES_G8]={233,288,312}; //140305 e tri
 const int NUM_EXP_SERIES_G9=2;
 const int EXP_SERIES_ID_LIST_G9[NUM_EXP_SERIES_G9]={288,312}; //140305 e trigger only removed 233
 
-int RDK2ExpAnalysis::getSeriesArray(TString inpGroup, int** outArray)
+int RDK2ExpAnalyzer::getSeriesArray(TString inpGroup, int** outArray)
 {
     int out;
 

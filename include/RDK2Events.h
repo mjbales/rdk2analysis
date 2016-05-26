@@ -14,8 +14,8 @@
 ///////////////////////////////////////////////////
 
 
-#ifndef CEVENTS_H_INCLUDED
-#define CEVENTS_H_INCLUDED
+#ifndef RDK2_H_INCLUDED
+#define MRKEVENTS_H_INCLUDED
 
 #pragma once
 
@@ -32,11 +32,11 @@
 
 
 
-class cEvents
+class MRKEvents
 {
 protected:
     TRandom3* ranGen;                   //Random number generator
-	TString eventFileName;               //Event File name to load
+	TString eventFilePath;               //Event File name to load
     TFile* eventFile;                   //ROOT File holding events
     TTree* eventTree;                   //ROOT Tree holding events
     cVector3D p0;
@@ -80,9 +80,9 @@ protected:
 
 
 public:
-	cEvents();                                          //Constructor
-	cEvents(UInt_t inpSeed);                               //Constructor
-	~cEvents();                                         //Destructor
+	MRKEvents();                                          //Constructor
+	MRKEvents(UInt_t inpSeed);                               //Constructor
+	~MRKEvents();                                         //Destructor
 	void reset();                                       //Resets events to baseline (destructor calls this)
 	int loadEvents(TString fileName,TString treeName);    //Designates root file where decay events are located
     int makeDerivedEvents();                            //Creates a secondary file from an already "loaded" event file that contains other simply calculated parameters
@@ -139,8 +139,8 @@ public:
                         EveType evetype, double littleb, bool inphomogeneous,
                         double gEmin,double gEmax,bool inpFermiOn=true, double inpZStart=EVENTGEN_Z_MIN, double inpZEnd=EVENTGEN_Z_MAX);
 
-	int makeDecayWidthCutMultiple(double littlebStart,    //For homogneous events, make multiple decay width cuts
-                                double littlebIncrement,const int littlebNum);        //based on a range of little b
+	int makeDecayWidthCutMultiple(const int littlebNum, double littlebStart,    //For homogneous events, make multiple decay width cuts
+                                double littlebIncrement);        //based on a range of little b
 
 	void runEventGen(TString runFileName);               //Takes a input filename (which it looks for in the current directory) which contains settings used to generate event files
 
@@ -157,4 +157,4 @@ public:
 
 TH1D* calcBRHist(int numPerBin,int numBins,double gEStart,double gEEnd,double inpEEMin,bool inpFermiOn,bool cumulative);
 
-#endif // CEVENTS_H_INCLUDED
+#endif // RDK2_H_INCLUDED

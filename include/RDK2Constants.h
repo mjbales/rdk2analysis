@@ -44,6 +44,7 @@
 #define DEFAULT_EVENTSDERV_TREENAME "ed"
 #define DEFAULT_RESULTSDERV_TREENAME "rd"
 #define DEFAULT_EXP_TREENAME "expTree"
+#define DEFAULT_LIL_B_TREENAME "lilbtree"
 #define SIG_SAVEEXIT 1
 #define EVENTGEN_Z_MAX .62
 #define EVENTGEN_Z_MIN -.18
@@ -116,17 +117,15 @@ enum CoDet{DET_NONE,DET_EP,DET_EPG,DET_EPBG,DET_G,DET_BG};
 
 //Folders
 #ifdef MJBLAPTOP
-//#define EVENTS_DIR "/media/mjbales/mjbexternal/events/"
-#define EVENTS_DIR "/media/mjbales/mjbexternal/events/"
-#define LITTLEB_DIR "/media/mjbales/mjbexternal/littleb/"
-#define RESULTS_DIR "/media/mjbales/mjbexternal/finalresults/"
-//#define RESULTS_DIR "/media/mjbales/mjbexternal/results/"
+#define EVENTS_DIR "/media/mjbales/mjbexternal/rdk/events/"
+#define LITTLEB_DIR "/media/mjbales/mjbexternal/rdk/littleb/"
+#define RESULTS_DIR "/media/mjbales/mjbexternal/rdk/finalresults/"
 #define GRAPHS_DIR "/home/mjbales/work/rdk/graphs/"
 #define HISTS_DIR "/home/mjbales/work/rdk/hists/"
 #define MACROS_DIR "/home/mjbales/work/rdk/macros/"
 #define MISC_DIR "/home/mjbales/work/rdk/misc/"
 #define MRKGEANTDATA_DIR "/home/mjbales/work/rdk/mrkgeantrun/"
-#define EXPANALYSIS_DIR "/media/mjbales/mjbexternal/analysis/"
+#define EXPANALYSIS_DIR "/media/mjbales/mjbexternal/rdk/analysis/"
 #define CALANALYSIS_DIR "/home/mjbales/work/rdk/calanalysis/"
 #define ANALYSIS_DIR "/home/mjbales/work/rdk/analysis/"
 #endif

@@ -10,7 +10,7 @@
 
 //MJB libraries
 #include "RDK2Constants.h"
-#include "RDK2Analysis.h"
+#include "RDK2IO.h"
 #include "MRText.h"
 #include "MRPhys.h"
 
@@ -21,18 +21,19 @@
 #include "TH1.h"
 #include "TVectorT.h"
 #include "TVector3.h"
+#include "TRegexp.h"
 
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-cEvents::cEvents(void)
+MRKEvents::MRKEvents(void)
 {
 	gE=0;
-    eventFile=NULL;
-    eventTree=NULL;
+    eventFile=nullptr;
+    eventTree=nullptr;
     numEvents=0;
     homogeneous=0;
-    ranGen = NULL;
+    ranGen = nullptr;
     fourBody=false;
     normConstant=0;
     fluxFileLoaded=false;
@@ -49,24 +50,24 @@ cEvents::cEvents(void)
 }
 
 
-cEvents::~cEvents(void)
+MRKEvents::~MRKEvents(void)
 {
 	reset();
-	if(ranGen!=NULL)
+	if(ranGen!=nullptr)
 	{
         delete ranGen;
 	}
 }
 
-void cEvents::reset()  //Doesn't delete ranGen but destructor does
+void MRKEvents::reset()  //Doesn't delete ranGen but destructor does
 {
-    if(eventFile!=NULL)
+    if(eventFile!=nullptr)
     {
         eventFile->Close();
         delete eventFile;
     }
-    eventFile=NULL;
-	eventTree=NULL;
+    eventFile=nullptr;
+	eventTree=nullptr;
 	if(fluxFileLoaded)
 	{
         fluxFileLoaded=false;
@@ -75,18 +76,18 @@ void cEvents::reset()  //Doesn't delete ranGen but destructor does
 	numEvents=0;
 }
 
-int cEvents::loadEvents(TString fileName,TString treeName)
+int MRKEvents::loadEvents(TString fileName,TString treeName)
 {
-    if(eventFile!=NULL){
+    if(eventFile!=nullptr){
         eventFile->Close();
         delete eventFile;
     }
 
-    if(ranGen==NULL)
+    if(ranGen==nullptr)
     {
         ranGen=new TRandom3();
     }
-	eventFileName = fileName;
+	eventFilePath = fileName;
 	eventFile = new TFile(fileName,"READ");
 
 	//Check to see if file was succesfully opened
@@ -137,14 +138,14 @@ int cEvents::loadEvents(TString fileName,TString treeName)
 }
 
 
-void cEvents::getPosVel(ParType parType,cVector3D& rOut,cVector3D& vOut,int eventPos)
+void MRKEvents::getPosVel(ParType parType,cVector3D& rOut,cVector3D& vOut,int eventPos)
 {
     eventTree->GetEntry(eventPos);
 
     getPosVel(parType, rOut, vOut);
 }
 
-void cEvents::getPosVel(ParType parType,cVector3D& rOut,cVector3D& vOut)
+void MRKEvents::getPosVel(ParType parType,cVector3D& rOut,cVector3D& vOut)
 {
     //Presumes event is currently loaded in the variables.
     if(parType==PROTON){
@@ -172,14 +173,14 @@ void cEvents::getPosVel(ParType parType,cVector3D& rOut,cVector3D& vOut)
     rOut.setVal(x0*.01,y0*.01,z0*.01); //For cm to meter conversion
 }
 
-void cEvents::getPosDirKE(ParType parType, cVector3D& rOut, cVector3D& dOut,double& keOut,int eventPos)
+void MRKEvents::getPosDirKE(ParType parType, cVector3D& rOut, cVector3D& dOut,double& keOut,int eventPos)
 {
     eventTree->GetEntry(eventPos);
 
    getPosDirKE( parType, rOut,  dOut, keOut);
 }
 
-void cEvents::getPosDirKE(ParType parType, cVector3D& rOut, cVector3D& dOut,double& keOut)
+void MRKEvents::getPosDirKE(ParType parType, cVector3D& rOut, cVector3D& dOut,double& keOut)
 {
 
     if(parType==PROTON){
@@ -201,19 +202,19 @@ void cEvents::getPosDirKE(ParType parType, cVector3D& rOut, cVector3D& dOut,doub
     rOut.setVal(x0*.01,y0*.01,z0*.01); //For cm to meter conversion
 }
 
-int cEvents::getEventStart(){
+int MRKEvents::getEventStart(){
     return eventStart;
 }
-int cEvents::getNumEvents(){
+int MRKEvents::getNumEvents(){
     return numEvents;
 }
-int cEvents::getEventEnd(){
+int MRKEvents::getEventEnd(){
     return eventEnd;
 }
 
 
 
-int cEvents::makeDerivedEvents(){
+int MRKEvents::makeDerivedEvents(){
 	Double_t vxp0,vyp0,vzp0;
 	Double_t vxe0,vye0,vze0;
 	Double_t vxg0,vyg0,vzg0;
@@ -231,7 +232,7 @@ int cEvents::makeDerivedEvents(){
 	double momentum,velocity;
 
 
-	TString derivedFileName=addBeforeExtension(eventFileName,"_Derv"); //Adds Derv suffix before extention (typically .root)
+	TString derivedFileName=addBeforeExtension(eventFilePath,"_Derv"); //Adds Derv suffix before extention (typically .root)
 
     //Open new file
 	TFile derivedFile(derivedFileName,"NEW");
@@ -317,7 +318,7 @@ int cEvents::makeDerivedEvents(){
     return 0;
 }
 
- bool cEvents::createRandomParameters(bool useEarlyRejector)
+ bool MRKEvents::createRandomParameters(bool useEarlyRejector)
  {
      ranProb=ranGen->Rndm();
 
@@ -370,8 +371,7 @@ int cEvents::makeDerivedEvents(){
 
     //Calculate remaining parameters
     eP=sqrt(eE*eE-EMASSE*EMASSE); //Proton energy
-    nE=NMASSE-PMASSE-eE-gE; //Changed 151207 to be leading order in recoil
-//    nE=(SQ(NMASSE)-SQ(PMASSE)+SQ(EMASSE)-2.*NMASSE*(eE+gE)+2.*eE*gE-2.*eP*gE*cos_eg)/2./(NMASSE-(eE+gE)+gE*cos_ng+eP*cos_en); //Neutrino energy
+    nE=(NMASSE*NMASSE-PMASSE*PMASSE+(EMASSE*EMASSE)-2.*NMASSE*(eE+gE)+2.*eE*gE-2.*eP*gE*cos_eg)/2./(NMASSE-(eE+gE)+gE*cos_ng+eP*cos_en); //Neutrino energy
 
     //If it is not kinematically allowed do not calculate any addition parameters
     //If this occurs this function will typically be called again until the neutrino energy is positive
@@ -400,13 +400,13 @@ int cEvents::makeDerivedEvents(){
     return true;
  }
 
- double cEvents::getJTWProb()
+ double MRKEvents::getJTWProb()
  {
 //     return (eE/eP)*FSCONST/(1.-exp(-eE/eP*FSCONST))*eP*eE*pow(ETEMAX-eE,2)*(1.+LITTLEA*eP/eE*cos_en+littleb*EMASSE/eE);
      return (eE/eP)*2*PI*FSCONST/(1.-exp(-eE/eP*FSCONST*2*PI))*eP*eE*pow(ETEMAX-eE,2)*(1.+LITTLEA*eP/eE*cos_en+littleb*EMASSE/eE);  //Fermi function corrected 4/25/13
  }
 
- double cEvents::getGapanovProb()
+ double MRKEvents::getGapanovProb()
  {
         // (1+lambda^2) term
         Prob=2.*(1.+(RADDECAY_LAMBDA*RADDECAY_LAMBDA))*(nE/(edg*edg)*((EMASSE*EMASSE)*(eE+gE)-edg*gE)+nE*(PMASSE*PMASSE)*eE/(pdg*pdg)-nE/edg/pdg*(eE*pdg-(pKE+PMASSE)*edg+(2.*eE+gE)*pde));
@@ -426,7 +426,7 @@ int cEvents::makeDerivedEvents(){
  }
 
 //Generates a 3 body decay momentums
-double cEvents::gen3BMom()
+double MRKEvents::gen3BMom()
 {
 
 	//Von Neuman rejection loop
@@ -471,7 +471,7 @@ double cEvents::gen3BMom()
 
 
 //Generates a 3 body decay momentums
-double cEvents::gen4BMom()
+double MRKEvents::gen4BMom()
  {
 	//Von Neuman rejection loop
 	for(;;)
@@ -513,7 +513,7 @@ double cEvents::gen4BMom()
 
 }
 
-void cEvents::genPos()
+void MRKEvents::genPos()
 {
     //Assumes fluxmap is already loaded
     cVector2D mapPos;
@@ -547,9 +547,9 @@ void cEvents::genPos()
 	y0=mapPos.z*(1-(FLUXMAP_POS_Z-z0)*sin(BEAM_DIVERGENCE));
 }
 
-void cEvents::loadFluxFileMap(TString fluxFileName)
+void MRKEvents::loadFluxFileMap(TString fluxFileName)
 {
-	if(ranGen==NULL)
+	if(ranGen==nullptr)
 	{
 		ranGen=new TRandom3();
 	}
@@ -562,9 +562,9 @@ void cEvents::loadFluxFileMap(TString fluxFileName)
     fluxFileLoaded=true;
 }
 
-int cEvents::makeEventFile(TString fileName, TString fluxFileName, int inpNumEvents,EveType evetype, double inpLittleb, bool inpHomogeneous,double inpGEMin, double inpGEMax, bool inpFermiOn,double inpZStart, double inpZEnd)
+int MRKEvents::makeEventFile(TString fileName, TString fluxFileName, int inpNumEvents,EveType evetype, double inpLittleb, bool inpHomogeneous,double inpGEMin, double inpGEMax, bool inpFermiOn,double inpZStart, double inpZEnd)
 {
-     if(ranGen==NULL)
+     if(ranGen==nullptr)
     {
         ranGen=new TRandom3();
     }
@@ -592,15 +592,15 @@ int cEvents::makeEventFile(TString fileName, TString fluxFileName, int inpNumEve
 
 }
 
-void cEvents::loadEventSettingsAndMakeFile(TString eventSettingsFilePath, int eventSet,TString fileName, TString fluxFileName,int inpNumEvents)
+void MRKEvents::loadEventSettingsAndMakeFile(TString eventSettingsFilePath, int eventSet,TString fileName, TString fluxFileName,int inpNumEvents)
 {
     loadEventSettings( eventSettingsFilePath,  eventSet);
     makeEventFile(fileName,fluxFileName,inpNumEvents);
 }
 
-int cEvents::makeEventFile(TString fileName, TString fluxFileName,int inpNumEvents)
+int MRKEvents::makeEventFile(TString fileName, TString fluxFileName,int inpNumEvents)
 {
-    if(ranGen==NULL)
+    if(ranGen==nullptr)
     {
         ranGen=new TRandom3();
     }
@@ -614,10 +614,10 @@ int cEvents::makeEventFile(TString fileName, TString fluxFileName,int inpNumEven
     cout << "Making " << numEvents << " events in " << fileName << "." << endl;
 
     eventFile=new TFile(fileName,"RECREATE");
-    eventFileName=fileName;
+    eventFilePath=fileName;
     int n;
 	if(eventFile->IsZombie()) {
-	    cout << "Error finding event file: " << eventFileName << endl;
+	    cout << "Error finding event file: " << eventFilePath << endl;
 		return -1;
 
 	}
@@ -652,6 +652,7 @@ int cEvents::makeEventFile(TString fileName, TString fluxFileName,int inpNumEven
 
 	for(n=0; n < numEvents; n++)
 	{
+		Prob=0;
 	    if(fourBody)
 	    {
 	        if(gen4BMom()>=1)
@@ -663,12 +664,12 @@ int cEvents::makeEventFile(TString fileName, TString fluxFileName,int inpNumEven
 	    }
 	    else
 	    {
-//            if(gen3BMom()>=1)
-//            {
-//	            cout << "Probability >1 detected" << endl;
-//	            typeAnythingToContinue("Type anything to continue");
-//                return -1;
-//	        }
+            if(gen3BMom()>=1)
+            {
+	            cout << "Probability >1 detected" << endl;
+	            typeAnythingToContinue("Type anything to continue");
+                return -1;
+	        }
 	    }
 
         if(Prob>1)
@@ -692,18 +693,18 @@ int cEvents::makeEventFile(TString fileName, TString fluxFileName,int inpNumEven
 	eventTree->Write("", TObject::kOverwrite);
 
     delete eventFile;
-    eventFile=NULL;
+    eventFile=nullptr;
     return 0;
 }
 
 
 
-int cEvents::makeEventFiles(TString firstFileName, TString fluxFileName, int numFiles,int numEventsPer,EveType evetype, double littleb, bool homogeneous,double gEmin,double gEmax,bool inpFermiOn, double inpZStart, double inpZEnd)
+int MRKEvents::makeEventFiles(TString firstFileName, TString fluxFileName, int numFiles,int numEventsPer,EveType evetype, double littleb, bool homogeneous,double gEmin,double gEmax,bool inpFermiOn, double inpZStart, double inpZEnd)
 {
     fermiOn=inpFermiOn;
     zStart=inpZStart;
     zEnd=inpZEnd;
-    if(ranGen==NULL)
+    if(ranGen==nullptr)
     {
         ranGen=new TRandom3(5211447);
     }
@@ -729,22 +730,24 @@ int cEvents::makeEventFiles(TString firstFileName, TString fluxFileName, int num
 }
 
 
-int cEvents::makeDecayWidthCutMultiple(double littlebStart, double littlebIncrement,const int littlebNum)
+int MRKEvents::makeDecayWidthCutMultiple(const int littlebNum,double littlebStart, double littlebIncrement)
 {
-    if(ranGen==NULL)
+    if(ranGen==nullptr)
     {
         ranGen=new TRandom3();
     }
+
+    TString lilBFilePath=fileNameFromFullPath(eventFilePath);
+    lilBFilePath=TString(LITTLEB_DIR)+"LilB"+lilBFilePath(TRegexp("_.*")); //Replace with new header
+    cout << "Making: " << lilBFilePath << endl;
+    TFile lilbFile(lilBFilePath,"RECREATE");
+    lilbFile.cd();
+    TTree* lilbTree=new TTree(DEFAULT_LIL_B_TREENAME,"Little b (Fierz) tree");
+
     vector<Int_t> dwcut;
     dwcut.resize(littlebNum);
-    TString lilbFileName=addBeforeExtension(eventFileName,"_lilb2");
-    cout << "Making: " << lilbFileName << endl;
-    //1 = cut 0 = keep
+     //1 = cut 0 = keep
     TString branchName,leafName;
-
-    TFile lilbFile(lilbFileName,"recreate");
-
-    TTree* lilbTree=new TTree("lilbTree","lilb tree");
 
     for(int j=0;j<littlebNum;j++)
     {
@@ -798,12 +801,12 @@ int cEvents::makeDecayWidthCutMultiple(double littlebStart, double littlebIncrem
 
         lilbTree->Fill();
     }
-    lilbTree->Write();
+    lilbTree->Write("",TObject::kOverwrite);
     lilbFile.Close();
     return 0;
 }
 
-double cEvents::getFitNormConstant(EveType evetype,double inpGEMin)
+double MRKEvents::getFitNormConstant(EveType evetype,double inpGEMin)
 {
     double out=0;
     if(evetype==FOURBODY)
@@ -818,7 +821,7 @@ double cEvents::getFitNormConstant(EveType evetype,double inpGEMin)
     return out;
 }
 
-void cEvents::setGoodNormConstant(EveType evetype,double littleb, double inpGEMin)
+void MRKEvents::setGoodNormConstant(EveType evetype,double littleb, double inpGEMin)
 {
     if(littleb ==0)
     {
@@ -830,13 +833,13 @@ void cEvents::setGoodNormConstant(EveType evetype,double littleb, double inpGEMi
     }
 }
 
-double cEvents::calcNormConstant(EveType evetype,double littleb, double inpGEMin)
+double MRKEvents::calcNormConstant(EveType evetype,double littleb, double inpGEMin)
 {
     fourBody= (evetype == FOURBODY);
 
     gEMin=inpGEMin;
 
-    if(ranGen==NULL)
+    if(ranGen==nullptr)
     {
         ranGen=new TRandom3();
     }
@@ -870,7 +873,7 @@ double cEvents::calcNormConstant(EveType evetype,double littleb, double inpGEMin
     return normConstant;
 }
 
-void cEvents::runEventGen(TString runFileName)
+void MRKEvents::runEventGen(TString runFileName)
 {
     ifstream runFile;
 
@@ -932,7 +935,7 @@ void cEvents::runEventGen(TString runFileName)
 }
 
 
-void cEvents::generateEvent()
+void MRKEvents::generateEvent()
 {
     if(fourBody)
     {
@@ -960,9 +963,9 @@ void cEvents::generateEvent()
     genPos();
 }
 
-void cEvents::loadEventSettings(TString eventSettingsFilePath, int eventSet)
+void MRKEvents::loadEventSettings(TString eventSettingsFilePath, int eventSet)
 {
-    if(ranGen != NULL)
+    if(ranGen != nullptr)
         delete ranGen;
     if(eventSet < 0)
     {
@@ -1005,21 +1008,21 @@ void cEvents::loadEventSettings(TString eventSettingsFilePath, int eventSet)
 }
 
 
-double cEvents::calcBR(double inpGEMin,double inpGEMax,double inpEEMin, int numRadEvents,bool inpFermiOn, double neutronLifetime)
+double MRKEvents::calcBR(double inpGEMin,double inpGEMax,double inpEEMin, int numRadEvents,bool inpFermiOn, double neutronLifetime)
 {
     double rate = calcFourBodyRate( inpGEMin, inpGEMax, inpEEMin,  numRadEvents, inpFermiOn);
     double br =neutronLifetime*rate;
     return br;
 }
 
-double cEvents::calcFourBodyRate(double inpGEMin,double inpGEMax,double inpEEMin, int numRadEvents,bool inpFermiOn)
+double MRKEvents::calcFourBodyRate(double inpGEMin,double inpGEMax,double inpEEMin, int numRadEvents,bool inpFermiOn)
 {
     gEMin=inpGEMin;
     gEMax=inpGEMax;
     eEMin=inpEEMin;
     fourBody=true;
     fermiOn=inpFermiOn;
-    if(ranGen==NULL)
+    if(ranGen==nullptr)
     {
         ranGen=new TRandom3();
     }
@@ -1096,7 +1099,7 @@ TH1D* calcBRHist(int numPerBin,int numBins,double gEStart,double gEEnd, double i
     brHist->GetYaxis()->SetTitle("Branching Ratio");
 
 
-    cEvents theEvents;
+    MRKEvents theEvents;
 
     increment=(gEEnd-gEStart)/((double) numBins);
     for(int i=0;i<numBins;i++)

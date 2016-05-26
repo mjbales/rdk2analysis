@@ -24,6 +24,10 @@
 #include "RDK2MCAnalyzer.h"
 #include "RDK2ExpAnalyzer.h"
 #include "RDK2Events.h"
+#include "RDK2Fierz.h"
+#include "RDK2IO.h"
+#include "RDK2AnalysisPlotting.h"
+#include "LTimeAnalysis.h"
 
 //#include "littlebanalysis.h"
 
@@ -1477,13 +1481,63 @@ int main(int argc, char * const argv[])
 //	makeEGTimingPlot(HistsDir+"ExpJeff_epg_egTOF_151122.txt",HistsDir+"ExpJeff_epbg_ebgTOF_151122.txt");
 //	makeZ0Hist();
 
-	double bgoCorrection=-.014;
-	double apdCorrection=-.003;
-	TString bgoExpID="d239_d240";
-	TString apdExpID="d236_d237";
-	double bgoEPCounts=2.31112e+08;
-	double apdEPCounts=2.51376e+07;
-	int mcID=87;
-	makeOtherParameterPlots(bgoExpID, bgoCorrection, apdExpID,  apdCorrection,  mcID, true);
+//	double bgoCorrection=-.014;
+//	double apdCorrection=-.003;
+//	TString bgoExpID="d239_d240";
+//	TString apdExpID="d236_d237";
+//	double bgoEPCounts=2.31112e+08;
+//	double apdEPCounts=2.51376e+07;
+//	int mcID=87;
+//	makeOtherParameterPlots(bgoExpID, bgoCorrection, apdExpID,  apdCorrection,  mcID, true);
+
+	/* Make beam shift macros */
+//	makeGeantMacroFilesForClusterEventGenerator(0,10, "RID543", PROTON, "STD_3B_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset -1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: -1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,10, "RID544", ELECTRON, "STD_3B_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset -1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: -1mm x beam shift
+//	makeGeantMacroFilesForhClusterEventGenerator(0,48, "RID545", PROTON, "STD_4B_100eV_Endpoint_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset -1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: -1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,48, "RID546", ELECTRON, "STD_4B_100eV_Endpoint_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset -1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: -1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,48, "RID547", GAMMA, "STD_4B_100eV_Endpoint_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset -1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: -1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,10, "RID548", PROTON, "STD_3B_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset 1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: +1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,10, "RID549", ELECTRON, "STD_3B_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset 1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: +1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,48, "RID550", PROTON, "STD_4B_100eV_Endpoint_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset 1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: +1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,48, "RID551", ELECTRON, "STD_4B_100eV_Endpoint_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset 1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: +1mm x beam shift
+//	makeGeantMacroFilesForClusterEventGenerator(0,48, "RID552", GAMMA, "STD_4B_100eV_Endpoint_130429", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm\n/MRK/setBeamOffset 1. 0. 0. mm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: +1mm x beam shift
+
+	/* Make homogenous event set  and macros*/
+//	createHomogenousEventSettings(500,"160323");
+//	makeGeantMacroFilesForClusterEventGenerator(0,100, "RID553", PROTON, "Hmg_3B_160323", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: Homegenous
+//	makeGeantMacroFilesForClusterEventGenerator(0,100, "RID554", ELECTRON, "Hmg_3B_160323", "/MRK/field/addNamedFields NEW_RDK2_MATT\n/MRK/det/setSiDeadLayerLengthCmd 13.7 nm"); //Geant4.9.6.p02 fixed beam with 13.7 nm dead layer: Homegenous
+
+	/* Testing homogenous events */
+//	createHomogenousEventsUsingSettings(1, 1000000, "160323");
+//
+	/*Analyze and plot beam shifts again after beam radii problem fix 160331*/
+//	createMCAnalysisAndPlot( "AID90",  "Beam shift 1mm x-", 10,  "RID543", "RID544",  48, "RID545",  "RID546", "RID547",  STD_EPCutSetL);
+//	createMCAnalysisAndPlot( "AID91",  "Beam shift 1mm x+", 10,  "RID548", "RID549",  48, "RID550",  "RID551", "RID552",  STD_EPCutSetL);
+//
+//	RDK2AnalysisPlotter thePlotter("BAPD Field from COMSOL","","AID87 AID90 AID91"); thePlotter.makeAll();
+
+	/*Create Paper Hists */
+//	double bgoCorrection=-.014;
+//	double apdCorrection=-.003;
+//	TString bgoExpID="d239_d240";
+//	TString apdExpID="d236_d237";
+//	double bgoEPCounts=2.31112e+08;
+//	double apdEPCounts=2.51376e+07;
+//	int mcID=89;
+////	makeOtherParameterPlots(bgoExpID, bgoCorrection, apdExpID,  apdCorrection,  mcID);
+//	makeCombinedBGOAndBAPDPlot(HistsDir+"BGO_"+bgoExpID+"_epg_gEn.txt", bgoCorrection, bgoEPCounts, HistsDir + "bAPD_"+apdExpID+"_epg_gEn.txt",apdCorrection, apdEPCounts, mcID,true,true,false,true,false);
+
+
+
+//	makeGeantMacroFilesForClusterEventGeneratorMakeEventsOnly(0,100, "Hmg_3B_160323");
+
+	/* Analyze hmg runs */
+//	createLilBTreesFromHmgEventFiles(100, "Hmg_3B_160323", 21, -1, 0.1);
+//	makeDWCutHists(21, "Hmg02", "First try Hmg Geant4.9.6.p02", 100,  "RID553", "RID554",  0, "",  "", "",  STD_EPCutSetL);
+//	plotLilBExpFitToMC(TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg02", EDEPE_DIM2, 21, -1, 0.1, 300., 600.);
+
+	/*Lifetime backscattering*/
+	//	analyzeProtonBackscattering("LifetimeProtonBackScattering");
+	makePosXYPlotFromReflect("LifetimeProtonBackScattering");
 	return 0;  //end int main()
 }

@@ -1,5 +1,5 @@
-#ifndef RDK2EXPANALYSIS_H
-#define RDK2EXPANALYSIS_H
+#ifndef RDK2EXPANALYZER_H
+#define RDK2EXPANALYZER_H
 
 #include "TNamed.h"
 #include "TString.h"
@@ -17,14 +17,14 @@
 //#define Exp_NUMBGO 1
 //#define Exp_NUMBAPD 1
 
-class RDK2ExpAnalysis : public TNamed
+class RDK2ExpAnalyzer : public TNamed
 {
     public:
 
         ///Constructers/Destructers
-        RDK2ExpAnalysis();
-        RDK2ExpAnalysis(TString inpName, TString inpTitle, TString inpPIDString,TString inpGroupString, RDK2CutSet inpCutSet,const double inpBGOWindows[6],const double inpBAPDWindows[6]);
-        virtual ~RDK2ExpAnalysis();
+        RDK2ExpAnalyzer();
+        RDK2ExpAnalyzer(TString inpName, TString inpTitle, TString inpPIDString,TString inpGroupString, RDK2CutSet inpCutSet,const double inpBGOWindows[6],const double inpBAPDWindows[6]);
+        virtual ~RDK2ExpAnalyzer();
 
         ///Setters
         inline void SetCutSet(RDK2CutSet inp){theCutSet=inp;}
@@ -169,7 +169,7 @@ class RDK2ExpAnalysis : public TNamed
     private:
 
     public:
-        ClassDef(RDK2ExpAnalysis,1); //Class to analyze RDK experimental data
+        ClassDef(RDK2ExpAnalyzer,1); //Class to analyze RDK experimental data
 };
 
-#endif // RDK2EXPANALYSIS_H
+#endif // RDK2EXPANALYZER_H

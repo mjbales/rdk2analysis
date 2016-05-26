@@ -1,5 +1,5 @@
-#ifndef MATTANALYSIS_H_INCLUDED
-#define MATTANALYSIS_H_INCLUDED
+#ifndef RDK2ANALYSIS_H_INCLUDED
+#define RDK2ANALYSIS_H_INCLUDED
 
 #include "TH1.h"
 #include "TString.h"
@@ -86,7 +86,7 @@ TH1D* makeEPProtonTOFOldMRK(int numFiles,int firstFile=0,TString datecode="10042
 void makeEPGToFComparison(TString expToFHistFileName, TString midString,TString highString,TString tofString,int multiplicity=1);
 TH1D* makeEPHist(int numFiles, TString protonString, TString electronString,TString drawString,TString cutsString,int numBins,double bottomHist,double topHist);
 
-double applyEDepModel(double e_dep,int detectorNumber, TRandom3* rootRanGen,EDepModel eDepModel = KEVIN_GAUS_EDEP,TGraph* responseGraph = NULL, int modelNumber=3); //Presumes det number is 1-12
+double applyEDepModel(double e_dep,int detectorNumber, TRandom3* rootRanGen,EDepModel eDepModel = KEVIN_GAUS_EDEP,TGraph* responseGraph = nullptr, int modelNumber=3); //Presumes det number is 1-12
 void makeMultiplicityFile(TString firstGammaFile, int numEPGFiles); //includes Kevin's Energy Resolution
 void analyzeBGORDK2(TString expToFHistFileName,TString expBGOSpectraHistFileName,TString tofNameString,int multiplicity);
 void makeSingleBGOSpectrum(TString filePath,TString histName, bool useKevinResolution=false);
@@ -149,10 +149,5 @@ void makeEGTimingPlot(TString histPath,TString bhistPath);
 void makeZ0Hist();
 void makeOtherParameterPlot(TString expID, double correction, int mcAIDNum, TString coTypeStr, TString plotType, TString imageType="pdf", bool halfPlotNoResids=false);
 void makeOtherParameterPlots(TString bgoExpID, double bgoCorrection, TString apdExpID, double apdCorrection, int mcID, bool halfPlotNoResids=false);
-TString getNextEventFileName(TString inpFileName);                       //Based on Changbo's event naming pattern, increments the set number
-TString getNextResultFileName(TString inpFileName);                      //Based on Matt's result file naming pattern, increments the set number
-TChain* makeResultChain(TString firstFileName, TString treeName,unsigned int numEventFiles);
-TChain* makeEventChain(TString firstFileName,TString treeName,unsigned int numEventFiles, bool isEventGenerator=false);
-TChain* makeExpChain(TString PIDString,const int numFiles,const int* seriesIDArray);
 TH1D* getExpEEBSHist();
-#endif // MATTANALYSIS_H_INCLUDED
+#endif // RDK2ANALYSIS_H_INCLUDED
