@@ -94,6 +94,29 @@ void createLilBTreesFromHmgEventFiles(int numFiles, TString eventSettingsString,
 	}
 }
 
+void makeEE0Plots(int numDWCut, TString inpName, TString inpTitle, int num3, TString p3RID, TString e3RID, int num4, TString p4RID, TString e4RID, TString g4RID, RDK2CutSet inpCutSet)
+{
+	RDK2MCAnalyzer theMCAnalyzer(inpName, inpTitle, num3, p3RID, e3RID, num4, p4RID, e4RID, g4RID, inpCutSet, true);
+	TH1* theHists[numDWCut];
+	for (int i = 0; i < numDWCut; i++)
+	{
+		theMCAnalyzer.SetName(inpName + "_dwcut" + int2str(i));
+		theMCAnalyzer.SetAddToAllCut(TCut("bChn.dwcutb" + int2str(i) + TString(" == 0")));
+		HistDim theDim={100,0,800};
+		theHists[i]=theMCAnalyzer.MakeHist("ee0Hist",THREEBODY,"ee0","",theDim);
+		cout << "Num Events: " << theHists[i]->Integral() << endl;
+	}
+
+	for (int i=0;i<numDWCut;i++)
+	{
+		double littleBValue = -.1 + i * .01;
+		TH1* drawnHists[2]={theHists[11],theHists[i]};
+		TString imagePath = TString(GRAPHS_DIR) + "Graph_Exp_MC_" + inpName + "_dwcut" + int2str(i) + "_EE0.png";
+		plotExpVersusMCToImage(0, nullptr, 2, drawnHists, "Comparison with little b = " + d2str(littleBValue), imagePath);
+	}
+}
+
+
 void makeDWCutHists(int numDWCut, TString inpName, TString inpTitle, int num3, TString p3RID, TString e3RID, int num4, TString p4RID, TString e4RID, TString g4RID, RDK2CutSet inpCutSet)
 {
 	RDK2MCAnalyzer theMCAnalyzer(inpName, inpTitle, num3, p3RID, e3RID, num4, p4RID, e4RID, g4RID, inpCutSet, true);
@@ -118,6 +141,12 @@ void plotLilBExpFitToMC(TString expHistFilePath, TString mcAnalIDString, HistDim
 	expHist->SetTitle("Exp.;Electron Pulse Height (~keV);Experimental counts");
 	expHist->Rebin(numRebin);
 	expHist->GetXaxis()->SetRangeUser(beginEnergy, endEnergy);
+	//Set bin error to constant percentage
+
+	for(int i=0;i<expHist->GetNbinsX();i++)
+	{
+		expHist->SetBinError(i+1,expHist->GetBinContent(i+1)*0.01);
+	}
 
 	double res[histDim.numBins] = { };
 
@@ -125,12 +154,15 @@ void plotLilBExpFitToMC(TString expHistFilePath, TString mcAnalIDString, HistDim
 	double chiSquaredTestResults[histDim.numBins] = { };
 	double kolmogorovTestResults[histDim.numBins] = { };
 
+//	TH1* mcHists[numDWCut]={};
+
+
 	for (int i = 0; i < numDWCut; i++)
 	{
 		littleBValues[i] = startLilB + i * incrementLilB;
 
-		int beginBin = lround((beginEnergy - histDim.binLowEdge) / (histDim.getBinWidth() * numRebin)) + 1;
-		int endBin = lround((endEnergy - histDim.binLowEdge) / (histDim.getBinWidth() * numRebin)) + 1;
+		int beginBin = lround((beginEnergy - histDim.binLowEdge) / (histDim.getBinWidth() * numRebin)) + 1.;
+		int endBin = lround((endEnergy - histDim.binLowEdge) / (histDim.getBinWidth() * numRebin)) + 1.;
 
 		TString mcHistFilePath = TString(HISTS_DIR) + "Hist_MC_" + mcAnalIDString + "_dwcut" + int2str(i) + "_EP_EDepE.txt";
 		if(!FileExists(mcHistFilePath))
@@ -165,7 +197,7 @@ void plotLilBExpFitToMC(TString expHistFilePath, TString mcAnalIDString, HistDim
 		chiSquaredTestResults[i] = expHist->Chi2TestX(mcHist, rootChiSquaredResult, ndf, igood, "WW", res);
 		cout << "P Result: " << chiSquaredTestResults[i] << endl;
 
-		kolmogorovTestResults[i] = expHist->KolmogorovTest(mcHist);
+//		kolmogorovTestResults[i] = expHist->KolmogorovTest(mcHist);
 
 		delete mcHist;
 	}
@@ -177,6 +209,9 @@ void plotLilBExpFitToMC(TString expHistFilePath, TString mcAnalIDString, HistDim
 	kolmogorovGraph.SetName("kolmogorovGraph");
 
 	TCanvas theCanvas;
+//	gPad->SetLogy(1);
+
+	chiSquaredGraph.SetTitle("Chi-squared result of various simulations to experiment with fixed 1/% per bin error;b;p-value");
 
 	chiSquaredGraph.Draw("ALP");
 

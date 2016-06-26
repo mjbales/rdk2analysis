@@ -150,4 +150,6 @@ void makeZ0Hist();
 void makeOtherParameterPlot(TString expID, double correction, int mcAIDNum, TString coTypeStr, TString plotType, TString imageType="pdf", bool halfPlotNoResids=false);
 void makeOtherParameterPlots(TString bgoExpID, double bgoCorrection, TString apdExpID, double apdCorrection, int mcID, bool halfPlotNoResids=false);
 TH1D* getExpEEBSHist();
+void outputParameterizedLOModelToText();
+void outputBGODataToFile();
 #endif // RDK2ANALYSIS_H_INCLUDED

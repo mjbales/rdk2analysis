@@ -1,3 +1,4 @@
+#include <RDK2AnalysisPlotter.h>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -26,31 +27,7 @@
 #include "RDK2Events.h"
 #include "RDK2Fierz.h"
 #include "RDK2IO.h"
-#include "RDK2AnalysisPlotting.h"
 #include "LTimeAnalysis.h"
-
-//#include "littlebanalysis.h"
-
-//#include "cParticle.h"
-//#include "MCanalysis2.h"
-//#include "SBD_Cal.h"
-//#include "mattexpanalysis.h"
-//#include "RDK2Vars.h"
-//#include "RDK2Set.h"
-
-//#include "cintProblemFunctions.h"
-//#include "constants.h"
-//#include "FermiRCooper.h"
-//#include "RDK2MCAnalysis.h"
-//#include "RDK2ExpAnalysis.h"
-//#include "RDK2Deconv.h"
-//#include "cEvents.h"
-//#include "cMRKText.h"
-//#include "mattmisc.h"
-//#include "mattio.h"
-//#include "mattanalysis.h"
-//#include "mattgraphics.h"
-//#include "ROOTField.h"
 
 using namespace std;
 
@@ -1533,11 +1510,27 @@ int main(int argc, char * const argv[])
 
 	/* Analyze hmg runs */
 //	createLilBTreesFromHmgEventFiles(100, "Hmg_3B_160323", 21, -1, 0.1);
-//	makeDWCutHists(21, "Hmg02", "First try Hmg Geant4.9.6.p02", 100,  "RID553", "RID554",  0, "",  "", "",  STD_EPCutSetL);
-//	plotLilBExpFitToMC(TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg02", EDEPE_DIM2, 21, -1, 0.1, 300., 600.);
+//	makeDWCutHists(21, "Hmg02", "First try Hmg Geant4.9.6.p02", 99,  "RID553", "RID554",  0, "",  "", "",  STD_EPCutSetL);
+//	plotLilBExpFitToMC(TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg02", EDEPE_DIM2, 21, -1, 0.1, 100., 700.);
+//	makeEE0Plots(21, "Hmg02", "First try Hmg Geant4.9.6.p02", 99,  "RID553", "RID554",  0, "",  "", "",  STD_EPCutSetL);
 
 	/*Lifetime backscattering*/
 	//	analyzeProtonBackscattering("LifetimeProtonBackScattering");
-	makePosXYPlotFromReflect("LifetimeProtonBackScattering");
+//	makePosXYPlotFromReflect("LifetimeProtonBackScattering");
+
+	/*Provide Kevin Graph of Parameterized LO Model*/
+//	outputParameterizedLOModelToText();
+//	outputBGODataToFile();
+
+	/*Lifetime backscattering Version differences*/
+//	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p02");
+//	analyzeProtonBackscattering("LifetimeProtonBackScattering_10.02");
+//	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p02","Protons detected entering SBD Active Layer (Geant4.9.6.p02 with deadlayer/gold RDK2 Geo)");
+//	makePosXYPlotFromReflect("LifetimeProtonBackScattering_10.02","Protons detected entering SBD Active Layer (Geant4.10.02 with deadlayer/gold RDK2 Geo)");
+	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p03");
+	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p04");
+	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p03","Protons detected entering SBD Active Layer (Geant4.9.6.p03 with deadlayer/gold RDK2 Geo)");
+	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p04","Protons detected entering SBD Active Layer (Geant4.9.6.p04 with deadlayer/gold RDK2 Geo)");
+
 	return 0;  //end int main()
 }

@@ -386,7 +386,7 @@ TH1* RDK2Set::makeHist(TString histName, TString drawString, TCut inpCut, TH1* h
 
 	cout << "Drawing: " << fullDrawString << endl;
 	cout << "using cuts: " << inpCut.GetTitle() << endl;
-	cout << "Events drawn: " << eventsChain->Draw(fullDrawString, inpCut) << endl;
+	cout << "Events drawn: " << eventsChain->Draw(fullDrawString, inpCut,"goff") << endl;
 	cout << "Hist Mean: " << outHist->GetMean() << endl;
 	outHist->Sumw2();
 	return outHist;
@@ -403,7 +403,7 @@ TH2D* RDK2Set::makeHist2D(TString histName, TString drawString, TCut inpCut, His
 
 	cout << "Drawing: " << drawString << endl;
 	cout << "using cuts: " << inpCut.GetTitle() << endl;
-	eventsChain->Project(histName, drawString, inpCut);
+	eventsChain->Project(histName, drawString, inpCut,"goff");
 	outHist->Sumw2();
 	return outHist;
 }

@@ -226,7 +226,7 @@ void analyzeProtonBackscattering(TString idString)
 
 //reflectTree->Draw("PosXEntry1/1000.:PosYEntry1/1000.","KEEntry1 > 0")
 
-void makePosXYPlotFromReflect(TString idString)
+void makePosXYPlotFromReflect(TString idString,TString titleString)
 {
 	//Get reflectTree
 	TString reflectFilePath=TString(MRKGEANTDATA_DIR)+"Results_"+idString+"_Reflect_Set0.root";
@@ -243,7 +243,7 @@ void makePosXYPlotFromReflect(TString idString)
 
 	int numFirstEntries = reflectTree->Draw("PosYEntry1*1000.:PosXEntry1*1000.","KEEntry1 > 0 && e.z0 > 0 && e.z0 < 0.32","goff");
 	TGraph* firstEntryGraph = new TGraph(numFirstEntries,reflectTree->GetV1(),reflectTree->GetV2());
-	firstEntryGraph->SetNameTitle("firstEntryGraph","Protons detected entering SBD Active Layer (Geant4.9.6.p02 with deadlayer/gold RDK2 Geo);x (mm);y (mm)");
+	firstEntryGraph->SetNameTitle("firstEntryGraph",titleString+";x (mm);y (mm)");
 	firstEntryGraph->Draw("AP");
 
 	int numSecondEntries = reflectTree->Draw("PosYEntry2*1000.:PosXEntry2*1000.","KEEntry2 > 0 && e.z0 > 0 && e.z0 < 0.32","goff");
@@ -266,7 +266,7 @@ void makePosXYPlotFromReflect(TString idString)
 	theLegend.AddEntry(firstEntryGraph,"Percent returned: "+d2str(percentSecondEntries,2,1)+"%","");
 	theLegend.Draw("same");
 
-	TString imagePath=TString(GRAPHS_DIR)+"Plot_LifeTimeBackscattering_PosX_v_PosY_1.png";
+	TString imagePath=TString(GRAPHS_DIR)+"Plot_"+idString+"PosX_v_PosY.png";
 	theCanvas.SaveAs(imagePath);
 }
 
