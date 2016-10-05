@@ -84,6 +84,8 @@ public:
 
 	void MakeAllStandardHists();
 
+	TH1* makeEEHistDecayWidthProb(TString nameString, double littleb, double normConstant,HistDim histDim);
+
 	double CalcEPer3Decay(double& error);
 	double CalcPPer3Decay(double& error);
 	double CalcEPer4Decay(double& error);

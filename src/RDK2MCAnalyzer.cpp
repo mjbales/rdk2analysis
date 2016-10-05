@@ -523,7 +523,15 @@ TH1* RDK2MCAnalyzer::MakeMultiplicityHist()
 	return outHist;
 }
 
-///Old way
+
+TH1* RDK2MCAnalyzer::makeEEHistDecayWidthProb(TString nameString,double littleb,double normConst,HistDim histDim)
+{
+
+	TH1* eEHist=threeBodySet.makeEEHistDecayWidthProb(nameString, theCutSet,littleb, normConst,histDim);
+
+	return eEHist;
+
+}
 void RDK2MCAnalyzer::MakeAllStandardHists()
 {
 	cout << "Making all standard histograms for: " << GetName() << endl;

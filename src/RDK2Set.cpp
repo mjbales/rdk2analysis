@@ -14,15 +14,18 @@
 #include "TH2.h"
 #include "TH3.h"
 #include "TEventList.h"
+#include "TVector3.h"
 
 #include "MRIO.h"
 #include "MRText.h"
+#include "MRMisc.h"
 
 #include "RDK2Vars.h"
 #include "RDK2Constants.h"
 #include "RDK2CutSet.h"
 #include "RDK2IO.h"
 #include "RDK2Analysis.h"
+#include "RDK2Events.h"
 
 using namespace std;
 
@@ -579,6 +582,87 @@ double RDK2Set::calcEPGRateFor3IndividualBAPDs(TCut epCut, double gammaEnergyCut
 	}
 	cout << "Total EPG Rate for 3 BAPD detectors: " << epgRate << endl;
 	return epgRate;
+}
+
+TH1* RDK2Set::makeEEHistDecayWidthProb(TString nameString, RDK2CutSet inpCutSet,double littleb, double normConst, HistDim histDim)
+{
+	TString detType =DET_EP;
+	if(!filesLoaded)
+		loadChainsAndFriend();
+
+	TString HistsDir = HISTS_DIR;
+	TString baseHistName = TString("MC_Hist_HmgProb_") + GetName();
+	TString endHistName = ".txt";
+
+	double pE, eE, pT;
+	//Begin by using SBDEDepTotal for P energy as we once were
+	pDervChain->SetBranchAddress("SBDEDepBlur", &pE);
+	eDervChain->SetBranchAddress("SBDEDepBlur", &eE);
+	pResultsChain->SetBranchAddress("SBDTimeFirst", &pT);
+
+	double ee0,ep0,mxe0,mye0,mze0,mxp0,myp0,mzp0; // Original event variables
+	eventsChain->SetBranchAddress("ee0",&ee0);
+	eventsChain->SetBranchAddress("ep0",&ep0);
+	eventsChain->SetBranchAddress("mxe0",&mxe0);
+	eventsChain->SetBranchAddress("mye0",&mye0);
+	eventsChain->SetBranchAddress("mze0",&mze0);
+	eventsChain->SetBranchAddress("mxp0",&mxp0);
+	eventsChain->SetBranchAddress("myp0",&myp0);
+	eventsChain->SetBranchAddress("mzp0",&mzp0);
+
+
+	TString coString = "EP";
+
+	TH1* eEHist = makeTH1DFromDim(nameString, HistsDir + baseHistName + coString + "_EDepE" + endHistName, histDim);
+	vector<double> binProb(histDim.numBins+2,0.);
+
+
+	TVector3 eVec,pVec,nVec;
+	double cos_en,prob;
+	///Fill Hists
+	int numEvents = eventsChain->GetEntries();
+	int foundBin=-1;
+	for (int i = 0; i < numEvents; i++)
+	{
+		eventsChain->GetEntry(i);
+
+		if(inpCutSet.CheckEE(eE)) //Passes e cut
+		{
+
+			if(inpCutSet.CheckPT(pT) && inpCutSet.CheckPE(pE))
+			{
+
+				//Calc prob
+				eVec.SetXYZ(mxe0,mye0,mze0);
+				pVec.SetXYZ(mxp0,myp0,mzp0);
+				nVec=-(eVec+pVec);
+				cos_en = eVec.Dot(nVec)/(eVec.Mag()*nVec.Mag());
+				prob = getJTWProb(ee0,ep0,cos_en,littleb)*normConst;
+
+				foundBin=eEHist->FindBin(eE);
+				if(foundBin >= 0 && foundBin < histDim.numBins+2)
+				{
+					binProb[foundBin] = binProb[foundBin] + prob;
+					eEHist->Fill(eE);
+				}
+
+			}
+
+		}
+
+	}
+
+	//Scale histogram by probabilies
+	eEHist->Sumw2();
+	for(int i=0;i<binProb.size();i++){
+		eEHist->SetBinContent(i,eEHist->GetBinContent(i)*binProb[i]);
+		eEHist->SetBinError(i,eEHist->GetBinError(i)*binProb[i]);
+	}
+	scaleHistTo(eEHist,1.);
+
+
+	return eEHist;
+
 }
 
 double RDK2Set::makeAllStandardHists(TString nameString, double& error, RDK2CutSet inpCutSet, CoDet detType, double inpEPPer3Decay, double branchingRatio)

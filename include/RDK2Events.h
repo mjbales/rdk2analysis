@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////
-//cEvents - by Matthew Bales
+//RDK2Events - by Matthew Bales
 //Event Generator code based on code by Robert Cooper
 //
 //Creates and stores neutron decay events
@@ -32,7 +32,7 @@
 
 
 
-class MRKEvents
+class RDK2Events
 {
 protected:
     TRandom3* ranGen;                   //Random number generator
@@ -74,15 +74,15 @@ protected:
 	double gen4BMom();         //Generates a 4 body momenta of all particles given a photon energy range. Stores results in variables assigned to tree.
 
 
-    double getJTWProb();                                          //Calculates the decay width for 3-body decay with arbitrary units from the JTW formula (does not include normConstant)
+    double calcJTWProb();                                          //Calculates the decay width for 3-body decay with arbitrary units from the JTW formula (does not include normConstant)
     double getGapanovProb();                                                    //Calculates the decay width for 4-body decay with arbitrary units from Gapanov's formula (does not include normConstant)
     int makeEventFile(TString fileName, TString fluxFileName,int inpNumEvents);                    //Makes an event file given the input requirements
 
 
 public:
-	MRKEvents();                                          //Constructor
-	MRKEvents(UInt_t inpSeed);                               //Constructor
-	~MRKEvents();                                         //Destructor
+	RDK2Events();                                          //Constructor
+	RDK2Events(UInt_t inpSeed);                               //Constructor
+	~RDK2Events();                                         //Destructor
 	void reset();                                       //Resets events to baseline (destructor calls this)
 	int loadEvents(TString fileName,TString treeName);    //Designates root file where decay events are located
     int makeDerivedEvents();                            //Creates a secondary file from an already "loaded" event file that contains other simply calculated parameters
@@ -140,7 +140,7 @@ public:
                         double gEmin,double gEmax,bool inpFermiOn=true, double inpZStart=EVENTGEN_Z_MIN, double inpZEnd=EVENTGEN_Z_MAX);
 
 	int makeDecayWidthCutMultiple(const int littlebNum, double littlebStart,    //For homogneous events, make multiple decay width cuts
-                                double littlebIncrement);        //based on a range of little b
+                                double littlebIncrement, int littleBSet);        //based on a range of little b
 
 	void runEventGen(TString runFileName);               //Takes a input filename (which it looks for in the current directory) which contains settings used to generate event files
 
@@ -156,5 +156,5 @@ public:
 };
 
 TH1D* calcBRHist(int numPerBin,int numBins,double gEStart,double gEEnd,double inpEEMin,bool inpFermiOn,bool cumulative);
-
+double getJTWProb(double eE,double eP,double cos_en,double littleb);
 #endif // RDK2_H_INCLUDED

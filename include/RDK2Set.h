@@ -79,6 +79,8 @@ public:
 	double calcEPGRateFor12IndividualBGOs(TCut epCut);
 	double calcEPGRateFor3IndividualBAPDs(TCut epCut, double gammaEnergyCutLow = 0.5, double gammaEnergyCutHigh = 20);
 
+	TH1* makeEEHistDecayWidthProb(TString nameString, RDK2CutSet inpCutSet,double littleb,double normConst, HistDim histDim);
+
 	double makeAllStandardHists(TString nameString, double& error, RDK2CutSet inpCutSet, CoDet detType, double inpEPPer3Decay = 0, double branchingRatio = 0);
 
 	void setEventList(TCut inpCut);

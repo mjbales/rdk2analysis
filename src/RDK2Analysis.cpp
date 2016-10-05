@@ -4259,28 +4259,20 @@ void createHistogramsForMCCalibraitonSourceData(int numFiles, TString runString)
 void createDerivedResultsFile(int startingEvent, TTree* inpResultsTree, TString filePathOut, int numberEvents)
 {
 	TRandom3* rootRanGen = new TRandom3(0);
+
 	const int numBGOs = 12;
 	const int numBAPDs = 3;
 
-	TGraph* bgoResponseGraph = getKhodyukBGOResponseGraph2();
+	bool hasBGOs=inpResultsTree->GetBranchStatus("BGO1EDepTotal");
+	bool hasBAPDs=inpResultsTree->GetBranchStatus("BAPD1EDepTotal");
+
+
 
 	double SBDEDepTotal, BGOEDepTotal[numBGOs], BAPDEDepTotal[numBAPDs];
 
 	inpResultsTree->SetBranchAddress("SBDEDepTotal", &SBDEDepTotal);
-
 	TString gChainString;
-	for (int i = 0; i < numBGOs; i++)
-	{
-		gChainString = "BGO" + int2str(i + 1) + "EDepTotal";
-		inpResultsTree->SetBranchAddress(gChainString, &(BGOEDepTotal[i]));
-	}
 
-	for (int i = 0; i < numBAPDs; i++)
-	{
-		gChainString = "BAPD" + int2str(i + 1) + "EDepTotal";
-		inpResultsTree->SetBranchAddress(gChainString, &(BAPDEDepTotal[i]));
-
-	}
 
 	double SBDEDepBlur, BGOEDepBlur[numBGOs], BGOEDepBlurEdge[numBGOs], BGOEDepBlurLOAllExpParam[numBGOs], BGOEDepBlurLOAllExpParamLow[numBGOs], BGOEDepBlurLOAllExpParamHigh[numBGOs], BGOEDepResOnly[numBGOs];
 //    double BAPDKEFirstNoSiO2[numBAPDS];
@@ -4296,58 +4288,68 @@ void createDerivedResultsFile(int startingEvent, TTree* inpResultsTree, TString 
 	TTree* dervTree = new TTree(DEFAULT_RESULTSDERV_TREENAME, "MRK Results Derived");
 
 	dervTree->Branch("SBDEDepBlur", &SBDEDepBlur, "SBDEDepBlur/D");
-	dervTree->Branch("BAPDmultiplicity", &BAPDmultiplicity, "BAPDmultiplicity/I");
-	dervTree->Branch("BGOmultiplicity", &BGOmultiplicity, "BGOmultiplicity/I");
-	dervTree->Branch("BGOmultiplicityEdge", &BGOmultiplicityEdge, "BGOmultiplicityEdge/I");
-	dervTree->Branch("BGOmultiplicityLOAllExpParam", &BGOmultiplicityLOAllExpParam, "BGOmultiplicityLOAllExpParam/I");
-	dervTree->Branch("BGOmultiplicityLOAllExpParamLow", &BGOmultiplicityLOAllExpParam, "BGOmultiplicityLOAllExpParamLow/I");
-	dervTree->Branch("BGOmultiplicityLOAllExpParamHigh", &BGOmultiplicityLOAllExpParamHigh, "BGOmultiplicityLOAllExpParamHigh/I");
-	dervTree->Branch("BGOmultiplicityResOnly", &BGOmultiplicityResOnly, "BGOmultiplicityResOnly/I");
-	for (int i = 0; i < numBGOs; i++)
+
+	TGraph* bgoResponseGraph=nullptr;
+
+	if(hasBGOs)
 	{
-		branchName = "BGO" + int2str(i + 1) + "EDepBlur";
-		branchNameWVar = branchName + "/D";
-		dervTree->Branch(branchName, &BGOEDepBlur[i], branchNameWVar);
+		bgoResponseGraph = getKhodyukBGOResponseGraph2();
 
-		branchName = "BGO" + int2str(i + 1) + "EDepBlurEdge";
-		branchNameWVar = branchName + "/D";
-		dervTree->Branch(branchName, &BGOEDepBlurEdge[i], branchNameWVar);
+		for (int i = 0; i < numBGOs; i++)
+		{
+			gChainString = "BGO" + int2str(i + 1) + "EDepTotal";
+			inpResultsTree->SetBranchAddress(gChainString, &(BGOEDepTotal[i]));
+		}
+		dervTree->Branch("BGOmultiplicity", &BGOmultiplicity, "BGOmultiplicity/I");
+		dervTree->Branch("BGOmultiplicityEdge", &BGOmultiplicityEdge, "BGOmultiplicityEdge/I");
+		dervTree->Branch("BGOmultiplicityLOAllExpParam", &BGOmultiplicityLOAllExpParam, "BGOmultiplicityLOAllExpParam/I");
+		dervTree->Branch("BGOmultiplicityLOAllExpParamLow", &BGOmultiplicityLOAllExpParam, "BGOmultiplicityLOAllExpParamLow/I");
+		dervTree->Branch("BGOmultiplicityLOAllExpParamHigh", &BGOmultiplicityLOAllExpParamHigh, "BGOmultiplicityLOAllExpParamHigh/I");
+		dervTree->Branch("BGOmultiplicityResOnly", &BGOmultiplicityResOnly, "BGOmultiplicityResOnly/I");
+		for (int i = 0; i < numBGOs; i++)
+		{
+			branchName = "BGO" + int2str(i + 1) + "EDepBlur";
+			branchNameWVar = branchName + "/D";
+			dervTree->Branch(branchName, &BGOEDepBlur[i], branchNameWVar);
 
-		branchName = "BGO" + int2str(i + 1) + "EDepBlurLOAllExpParam";
-		branchNameWVar = branchName + "/D";
-		dervTree->Branch(branchName, &BGOEDepBlurLOAllExpParam[i], branchNameWVar);
+			branchName = "BGO" + int2str(i + 1) + "EDepBlurEdge";
+			branchNameWVar = branchName + "/D";
+			dervTree->Branch(branchName, &BGOEDepBlurEdge[i], branchNameWVar);
 
-		branchName = "BGO" + int2str(i + 1) + "EDepBlurLOAllExpParamLow";
-		branchNameWVar = branchName + "/D";
-		dervTree->Branch(branchName, &BGOEDepBlurLOAllExpParamLow[i], branchNameWVar);
+			branchName = "BGO" + int2str(i + 1) + "EDepBlurLOAllExpParam";
+			branchNameWVar = branchName + "/D";
+			dervTree->Branch(branchName, &BGOEDepBlurLOAllExpParam[i], branchNameWVar);
 
-		branchName = "BGO" + int2str(i + 1) + "EDepBlurLOAllExpParamHigh";
-		branchNameWVar = branchName + "/D";
-		dervTree->Branch(branchName, &BGOEDepBlurLOAllExpParamHigh[i], branchNameWVar);
+			branchName = "BGO" + int2str(i + 1) + "EDepBlurLOAllExpParamLow";
+			branchNameWVar = branchName + "/D";
+			dervTree->Branch(branchName, &BGOEDepBlurLOAllExpParamLow[i], branchNameWVar);
 
-		branchName = "BGO" + int2str(i + 1) + "EDepResOnly";
-		branchNameWVar = branchName + "/D";
-		dervTree->Branch(branchName, &BGOEDepResOnly[i], branchNameWVar);
+			branchName = "BGO" + int2str(i + 1) + "EDepBlurLOAllExpParamHigh";
+			branchNameWVar = branchName + "/D";
+			dervTree->Branch(branchName, &BGOEDepBlurLOAllExpParamHigh[i], branchNameWVar);
 
+			branchName = "BGO" + int2str(i + 1) + "EDepResOnly";
+			branchNameWVar = branchName + "/D";
+			dervTree->Branch(branchName, &BGOEDepResOnly[i], branchNameWVar);
+
+		}
 	}
-//        for (int i=0;i<numBAPDS;i++)
-//        {
-//            branchName="BAPD"+int2str(i+1)+"KEFirstNoSiO2";
-//            branchNameWVar=branchName+"/D";
-//            dervTree->Branch(branchName,&BAPDKEFirstNoSiO2[i],branchNameWVar);
-//
-//        }
+
+	if(hasBAPDs)
+	{
+		for (int i = 0; i < numBAPDs; i++)
+		{
+			gChainString = "BAPD" + int2str(i + 1) + "EDepTotal";
+			inpResultsTree->SetBranchAddress(gChainString, &(BAPDEDepTotal[i]));
+
+		}
+		dervTree->Branch("BAPDmultiplicity", &BAPDmultiplicity, "BAPDmultiplicity/I");
+	}
 
 	for (int i = startingEvent; i < startingEvent + numberEvents; i++)
 	{
 		inpResultsTree->GetEntry(i);
-		BGOmultiplicity = 0;
-		BGOmultiplicityEdge = 0;
-		BGOmultiplicityLOAllExpParam = 0;
-		BGOmultiplicityLOAllExpParamLow = 0;
-		BGOmultiplicityLOAllExpParamHigh = 0;
-		BGOmultiplicityResOnly = 0;
-		BAPDmultiplicity = 0;
+
 
 		if(SBDEDepTotal > 0)
 		{
@@ -4358,76 +4360,90 @@ void createDerivedResultsFile(int startingEvent, TTree* inpResultsTree, TString 
 			SBDEDepBlur = 0;
 		}
 
-		for (int k = 0; k < numBGOs; k++)
+		if(hasBGOs)
 		{
-			if(BGOEDepTotal[k] > 0)
+			BGOmultiplicity = 0;
+			BGOmultiplicityEdge = 0;
+			BGOmultiplicityLOAllExpParam = 0;
+			BGOmultiplicityLOAllExpParamLow = 0;
+			BGOmultiplicityLOAllExpParamHigh = 0;
+			BGOmultiplicityResOnly = 0;
+			BAPDmultiplicity = 0;
+
+			for (int k = 0; k < numBGOs; k++)
 			{
-				BGOEDepBlur[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, KEVIN_GAUS_EDEP);
-				if(BGOEDepBlur[k] < 10)
+				if(BGOEDepTotal[k] > 0)
 				{
-					// BGOEDepBlur[k]=0;
+					BGOEDepBlur[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, KEVIN_GAUS_EDEP);
+					if(BGOEDepBlur[k] < 10)
+					{
+						// BGOEDepBlur[k]=0;
+					}
+					else
+						BGOmultiplicity++;
+
+					BGOEDepBlurEdge[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, KHODYUK_PARAM_MODEL_WGAUSS, nullptr);
+					if(BGOEDepBlurEdge[k] < 10)
+					{
+						// BGOEDepBlurEdge[k]=0;
+					}
+					else
+						BGOmultiplicityEdge++;
+
+					BGOEDepBlurLOAllExpParam[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, ALLEXP_PARAM_MODEL, nullptr);
+					if(BGOEDepBlurLOAllExpParam[k] < 10)
+					{
+						//BGOEDepBlurLOAllExpParam[k]=0;
+					}
+					else
+						BGOmultiplicityLOAllExpParam++;
+
+					BGOEDepBlurLOAllExpParamLow[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, ALLEXP_PARAM_MODEL_LOW, nullptr);
+					if(BGOEDepBlurLOAllExpParamLow[k] < 10)
+					{
+						// BGOEDepBlurLOAllExpParamLow[k]=0;
+					}
+					else
+						BGOmultiplicityLOAllExpParamLow++;
+
+					BGOEDepBlurLOAllExpParamHigh[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, ALLEXP_PARAM_MODEL_HIGH, nullptr);
+					if(BGOEDepBlurLOAllExpParamHigh[k] < 10)
+					{
+						// BGOEDepBlurLOAllExpParamHigh[k]=0;
+					}
+					else
+
+						BGOmultiplicityLOAllExpParamHigh++;
+
+					BGOEDepResOnly[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, EDEP_WRESONLY, nullptr);
+					if(BGOEDepResOnly[k] < 10)
+					{
+						//  BGOEDepResOnly[k]=0;
+					}
+					else
+						BGOmultiplicityResOnly++;
+
 				}
 				else
-					BGOmultiplicity++;
-
-				BGOEDepBlurEdge[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, KHODYUK_PARAM_MODEL_WGAUSS, nullptr);
-				if(BGOEDepBlurEdge[k] < 10)
 				{
-					// BGOEDepBlurEdge[k]=0;
+					BGOEDepBlur[k] = 0;
+					BGOEDepBlurEdge[k] = 0;
+					BGOEDepBlurLOAllExpParamHigh[k] = 0;
+					BGOEDepBlurLOAllExpParam[k] = 0;
+					BGOEDepBlurLOAllExpParamLow[k] = 0;
+					BGOEDepResOnly[k] = 0;
 				}
-				else
-					BGOmultiplicityEdge++;
-
-				BGOEDepBlurLOAllExpParam[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, ALLEXP_PARAM_MODEL, nullptr);
-				if(BGOEDepBlurLOAllExpParam[k] < 10)
-				{
-					//BGOEDepBlurLOAllExpParam[k]=0;
-				}
-				else
-					BGOmultiplicityLOAllExpParam++;
-
-				BGOEDepBlurLOAllExpParamLow[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, ALLEXP_PARAM_MODEL_LOW, nullptr);
-				if(BGOEDepBlurLOAllExpParamLow[k] < 10)
-				{
-					// BGOEDepBlurLOAllExpParamLow[k]=0;
-				}
-				else
-					BGOmultiplicityLOAllExpParamLow++;
-
-				BGOEDepBlurLOAllExpParamHigh[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, ALLEXP_PARAM_MODEL_HIGH, nullptr);
-				if(BGOEDepBlurLOAllExpParamHigh[k] < 10)
-				{
-					// BGOEDepBlurLOAllExpParamHigh[k]=0;
-				}
-				else
-
-					BGOmultiplicityLOAllExpParamHigh++;
-
-				BGOEDepResOnly[k] = applyEDepModel(BGOEDepTotal[k], k + 1, rootRanGen, EDEP_WRESONLY, nullptr);
-				if(BGOEDepResOnly[k] < 10)
-				{
-					//  BGOEDepResOnly[k]=0;
-				}
-				else
-					BGOmultiplicityResOnly++;
-
-			}
-			else
-			{
-				BGOEDepBlur[k] = 0;
-				BGOEDepBlurEdge[k] = 0;
-				BGOEDepBlurLOAllExpParamHigh[k] = 0;
-				BGOEDepBlurLOAllExpParam[k] = 0;
-				BGOEDepBlurLOAllExpParamLow[k] = 0;
-				BGOEDepResOnly[k] = 0;
 			}
 		}
 
-		for (int k = 0; k < numBAPDs; k++)
+		if(hasBAPDs)
 		{
-			if(BAPDEDepTotal[k] > 0.3)
+			for (int k = 0; k < numBAPDs; k++)
 			{
-				BAPDmultiplicity++;
+				if(BAPDEDepTotal[k] > 0.3)
+				{
+					BAPDmultiplicity++;
+				}
 			}
 		}
 
@@ -6000,7 +6016,7 @@ void outputBGODataToFile()
 	double dewarEnergies[numDewarPoints]={122.1,81,59.5,31,99.8,88,23.3,122.1,99.8,88,23.3,122.1,185.7,107};
 	double dewarLOs[numDewarPoints]={0.90033,0.91603,0.88772,0.81225,0.86602,0.90747,0.73221,0.8827,0.86363,0.90637,0.7364,0.89272,0.93333,0.8203};
 	double dewarLOErrors[numDewarPoints]={0.010849,0.010122,0.010078,0.010542,0.012021,0.010652,0.03,0.010572,0.010722,0.010078,0.025,0.010022,0.015,0.02};
-	for(int i; i <numDewarPoints; i++)
+	for(int i=0; i <numDewarPoints; i++)
 	{
 		theFile << "0\t" << dewarEnergies[i] << "\t" << dewarLOs[i] << "\t" << dewarLOErrors[i] << endl;
 	}
@@ -6009,7 +6025,7 @@ void outputBGODataToFile()
 	double calRDK2Energies[numCalRDK2Points]={32.3,42.7,78.7,79.7,121.9,356};
 	double calRDK2LOs[numCalRDK2Points]={0.81,0.86,0.94,0.93,0.92,0.986};
 	double calRDK2LOErrors[numCalRDK2Points]={0.02,0.02,0.01,0.01,0.01,0.002};
-	for(int i; i <numCalRDK2Points; i++)
+	for(int i=0; i <numCalRDK2Points; i++)
 	{
 		theFile << "1\t" << calRDK2Energies[i] << "\t" << calRDK2LOs[i] << "\t" << calRDK2LOErrors[i] << endl;
 	}
@@ -6060,7 +6076,7 @@ void outputBGODataToFile()
 		0.017,0.018,0.017,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,
 		0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,
 		0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018,0.018};
-	for(int i; i <numKhodyukPoints; i++)
+	for(int i=0; i <numKhodyukPoints; i++)
 	{
 		theFile << "2\t" << khodyukEnergies[i] << "\t" << khodyukLOs[i] << "\t" << khodyukLOErrors[i] << endl;
 	}
@@ -6069,7 +6085,7 @@ void outputBGODataToFile()
 	double moszynskiEnergies[numMoszynskiPoints]={14.4,16.6,22,31,32,45,52,59.6,74,81,84,88,122,244.1,302.9,320.1,335.8,356,411.8,435,493.7,511,569.7,586,662,758.8,834.8,1063.7,1173.2,1275};
 	double moszynskiLOs[numMoszynskiPoints]={0.711,0.719,0.775,0.829,0.8412,0.853,0.9,0.893,0.91,0.926,0.937,0.933,0.915,0.964,0.979,0.964,0.97,0.986,0.97,0.995,1,0.996,1,0.999,1,1,1,1.01,1.013,1.01};
 	double moszynskiLOErrors[numMoszynskiPoints]={0.01422,0.01438,0.0155,0.01658,0.016824,0.02559,0.018,0.01786,0.0182,0.01852,0.01874,0.01866,0.0183,0.02892,0.01958,0.01928,0.0291,0.01972,0.0194,0.02985,0.03,0.01992,0.02,0.02997,0.02,0.03,0.02,0.0202,0.02026,0.0202};
-	for(int i; i <numMoszynskiPoints; i++)
+	for(int i=0; i <numMoszynskiPoints; i++)
 	{
 		theFile << "3\t" << moszynskiEnergies[i] << "\t" << moszynskiLOs[i] << "\t" << moszynskiLOErrors[i] << endl;
 	}
@@ -6078,7 +6094,7 @@ void outputBGODataToFile()
 	double averkievEnergies[numAverkievPoints]={2.1,6.4,7.5,8.0,8.8,10.0,11.2,16.6,17.2,23.5,33.1,58.3,71.6,78.3,120.1,162.3,277.4,384.8,506.5,657.9};
 	double averkievLOs[numAverkievPoints]={0.854,0.777,0.739,0.706,0.678,0.657,0.641,0.579,0.590,0.685,0.731,0.837,0.844,0.827,0.884,0.903,0.959,0.977,0.986,0.996};
 	double averkievLOErrors[numAverkievPoints]={0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.035,0.035,0.035,0.035,0.035,0.02,0.015,0.01,0.005,0.005};
-	for(int i; i <numAverkievPoints; i++)
+	for(int i=0; i <numAverkievPoints; i++)
 	{
 		theFile << "4\t" << averkievEnergies[i] << "\t" << averkievLOs[i] << "\t" << averkievLOErrors[i] << endl;
 	}

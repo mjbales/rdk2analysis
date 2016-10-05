@@ -29,6 +29,9 @@
 #include "RDK2IO.h"
 #include "LTimeAnalysis.h"
 
+#include "MRGraphics.h"
+#include "MRIO.h"
+
 using namespace std;
 
 int main(int argc, char * const argv[])
@@ -1527,10 +1530,49 @@ int main(int argc, char * const argv[])
 //	analyzeProtonBackscattering("LifetimeProtonBackScattering_10.02");
 //	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p02","Protons detected entering SBD Active Layer (Geant4.9.6.p02 with deadlayer/gold RDK2 Geo)");
 //	makePosXYPlotFromReflect("LifetimeProtonBackScattering_10.02","Protons detected entering SBD Active Layer (Geant4.10.02 with deadlayer/gold RDK2 Geo)");
-	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p03");
-	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p04");
-	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p03","Protons detected entering SBD Active Layer (Geant4.9.6.p03 with deadlayer/gold RDK2 Geo)");
-	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p04","Protons detected entering SBD Active Layer (Geant4.9.6.p04 with deadlayer/gold RDK2 Geo)");
+//	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p03");
+//	analyzeProtonBackscattering("LifetimeProtonBackScattering_9.6.p04");
+//	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p03","Protons detected entering SBD Active Layer (Geant4.9.6.p03 with deadlayer/gold RDK2 Geo)");
+//	makePosXYPlotFromReflect("LifetimeProtonBackScattering_9.6.p04","Protons detected entering SBD Active Layer (Geant4.9.6.p04 with deadlayer/gold RDK2 Geo)");
+
+	/*Electron backscattering */
+//	analyzeAllEBackscatteringSBDOnly();
+//	makeBSPlotsSBDOnly();
+//	makeBSPlotsSBDOnly2();
+
+	/*Electron backscattering through secondary events*/
+//	makeAllIncidentEventsFromResults(100, "RID554");
+//	vector<TString> rids={"Liv","GS","WVI","SingleScatter","Penelope"};
+//	for(unsigned int i=0;i<rids.size();i++)
+//	{kwatch
+//		makeSecondaryMacros(100, "RID554", "RID"+TString::Itoa(i+555,10),rids[i]);
+//	}
+//	makeDWCutHists(21, "Hmg03", "Geant4.10.02 Livermore Secondary Events", 99,  "RID553", "RID555",  0, "",  "", "",  STD_EPCutSetL);
+//	makeDWCutHists(21, "Hmg04", "Geant4.10.02 WVI Secondary Events", 99,  "RID553", "RID557",  0, "",  "", "",  STD_EPCutSetL);
+//	plotLilBExpFitToMC("Geant4.9.6.p02 Livermore (small range) Added constant error",TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg01", EDEPE_DIM2, 21, -0.1, 0.01, 100., 700.);
+//	plotLilBExpFitToMC("Geant4.9.6.p02 Livermore (large range) Added constant error",TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg02", EDEPE_DIM2, 21, -1, 0.1, 100., 700.);
+//	plotLilBExpFitToMC("Geant4.10.02 Livermore Secondary Added constant error",TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg03", EDEPE_DIM2, 21, -1, 0.1, 100., 700.);
+//	plotLilBExpFitToMC("Geant4.10.02 WVI Secondary Added constant error",TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg04", EDEPE_DIM2, 21, -1, 0.1, 100., 700.);
+//	createLilBTreesFromHmgEventFiles(100, "Hmg_3B_160323", 41, -0.2, 0.01,1);
+//    makeDWCutHists(41, "Hmg05", "Geant4.9.6.p02 Livermore (medium range)", 99,  "RID553", "RID554",  0, "",  "", "",  STD_EPCutSetL);
+//	makeDWCutHists(41, "Hmg06", "Geant4.10.02 WVI Secondary Events (medium range)", 99,  "RID553", "RID557",  0, "",  "", "",  STD_EPCutSetL);
+//	makeDWCutHists(41, "Hmg07", "Geant4.10.02 Livermore Secondary Events (medium range)", 99,  "RID553", "RID555",  0, "",  "", "",  STD_EPCutSetL);
+//	plotLilBExpFitToMC("Geant4.9.6.p02 Livermore (medium range)",TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg05", EDEPE_DIM2, 41, -.2, 0.01, 100., 700.);
+//	plotLilBExpFitToMC("Geant4.10.02 WVI Secondary Added constant error",TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg06", EDEPE_DIM2, 41, -.2, 0.01, 100., 700.);
+//	plotLilBExpFitToMC("Geant4.10.02 Livermore Secondary Added constant error",TStringkwatch(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", "Hmg07", EDEPE_DIM2, 41, -.2, 0.01, 100., 700.);
+
+	/*Analyze little b through secondary events*/
+	RDK2MCAnalyzer theMCAnalyzer("Hmg10", "Geant4.10.02 Livermore Secondary Events", 1,  "RID553", "RID555",  0, "",  "", "",  STD_EPCutSetL,true);
+//	RDK2MCAnalyzer theMCAnalyzer("Hmg11", "Geant4.10.02 Livermore Secondary Events", 1,  "RID533", "RID534",  0, "",  "", "",  STD_EPCutSetL,false);
+	makeBootStrapLittleB( TString(HISTS_DIR)+"BGO_d239_d240_ep_eEn.txt", EDEPE_DIM2, theMCAnalyzer,   3, -0.1, 0.1, 100., 700.);
+
+	/*Checking hists*/
+	TH1* hists[1]={getTabSeperatedHist(HistsDir+"Hist_MC_Hmg10_dwcut1_EP_EDepEProb.txt",EDEPE_DIM2)};
+	hists[0]->Rebin(100);
+	plotExpVersusMCToImage(1,hists,0,nullptr,"test",GraphsDir+"test.png",false);
+
+//	RDK2MCAnalyzer theMCAnalyzer("Hmg10", "Geant4.10.02 Livermore Secondary Events", 1,  "RID553", "RID555",  0, "",  "", "",  STD_EPCutSetL,true);
+//	theMCAnalyzer.MakeAllStandardHists();
 
 	return 0;  //end int main()
 }
